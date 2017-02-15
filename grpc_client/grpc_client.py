@@ -51,11 +51,12 @@ class GrpcClient(object):
     RETRY_BACKOFF = [0.05, 0.1, 0.2, 0.5, 1, 2, 5]
 
     def __init__(self, consul_endpoint, work_dir, endpoint='localhost:50055',
-                 reconnect_callback=None):
+                 reconnect_callback=None, credentials=None):
         self.consul_endpoint = consul_endpoint
         self.endpoint = endpoint
         self.work_dir = work_dir
         self.reconnect_callback = reconnect_callback
+        self.credentials = credentials
 
         self.plugin_dir = os.path.abspath(os.path.join(
             os.path.dirname(__file__), '../protoc_plugins'))
@@ -100,8 +101,12 @@ class GrpcClient(object):
             else:
                 _endpoint = self.endpoint
 
-            log.info('connecting', endpoint=_endpoint)
-            self.channel = grpc.insecure_channel(_endpoint)
+            if self.credentials:
+                log.info('securely connecting', endpoint=_endpoint)
+                self.channel = grpc.secure_channel(_endpoint, self.credentials)
+            else:
+                log.info('insecurely connecting', endpoint=_endpoint)
+                self.channel = grpc.insecure_channel(_endpoint)
 
             swagger_from = self._retrieve_schema()
             self._compile_proto_files(swagger_from)
