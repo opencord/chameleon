@@ -47,7 +47,8 @@ defs = dict(
     internal_host_address=os.environ.get('INTERNAL_HOST_ADDRESS',
                                          get_my_primary_local_ipv4()),
     rest_port=os.environ.get('REST_PORT', 8881),
-    work_dir=os.environ.get('WORK_DIR', '/tmp/chameleon')
+    work_dir=os.environ.get('WORK_DIR', '/tmp/chameleon'),
+    swagger_url=os.environ.get('SWAGGER_URL', '/'),
 )
 
 
@@ -159,6 +160,14 @@ def parse_args():
                         default=False,
                         help=_help)
 
+    _help = ('override swagger url (default=%s)'
+             % defs['swagger_url'])
+    parser.add_argument('-S', '--swagger-url',
+                        dest='swagger_url',
+                        action='store',
+                        default=defs['swagger_url'],
+                        help=_help)
+
     args = parser.parse_args()
 
     # post-processing
@@ -227,7 +236,7 @@ class Main(object):
             self.grpc_client = yield \
                 GrpcClient(args.consul, args.work_dir, args.grpc_endpoint)
             self.rest_server = yield \
-                WebServer(args.rest_port, args.work_dir, self.grpc_client).start()
+                WebServer(args.rest_port, args.work_dir, args.swagger_url, self.grpc_client).start()
             self.grpc_client.set_reconnect_callback(
                 self.rest_server.reload_generated_routes).start()
             self.log.info('started-internal-services')
