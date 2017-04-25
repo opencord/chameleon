@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba092121_49bbc672",
+        "filename": "web_server/web_server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1000056
+      },
+      "writtenOn": "2017-04-25T02:23:46Z",
+      "side": 1,
+      "message": "Would you need to add the swagger url to add_routes method in gw_gen.py under protoc_plugins directory?",
+      "revId": "54356570c47ac2f00c5c14e91d4f4a734b036465",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
