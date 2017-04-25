@@ -37,17 +37,38 @@ class WebServer(object):
 
     app = Klein()
 
-    def __init__(self, port, work_dir, grpc_client):
+    def __init__(self, port, work_dir, swagger_url, grpc_client):
         self.port = port
         self.site = None
         self.work_dir = work_dir
         self.grpc_client = grpc_client
+        self.swagger_url = swagger_url
 
         self.swagger_ui_root_dir = os.path.abspath(
             os.path.join(os.path.dirname(__file__), '../swagger_ui'))
 
         self.tcp_port = None
         self.shutting_down = False
+
+        self.add_swagger_routes(self.app, swagger_url)
+
+    def add_swagger_routes(self, app, swagger_url):
+        log.info('Publishing swagger docs at %s' % swagger_url)
+
+        @app.route(swagger_url + '/', branch=True)
+        def static(self, request):
+            try:
+                log.debug(request=request)
+                return File(self.swagger_ui_root_dir)
+            except Exception, e:
+                log.exception('file-not-found', request=request)
+
+        @app.route(swagger_url + '/v1/swagger.json')
+        def swagger_json(self, request):
+            try:
+                return File(os.path.join(self.work_dir, 'swagger.json'))
+            except Exception, e:
+                log.exception('file-not-found', request=request)
 
     @inlineCallbacks
     def start(self):
@@ -81,25 +102,6 @@ class WebServer(object):
                 assert hasattr(m, 'add_routes')
                 m.add_routes(self.app, self.grpc_client)
                 log.info('routes-loaded', module=module_name)
-
-    # static swagger_ui website as landing page (for now)
-
-    @app.route('/', branch=True)
-    def static(self, request):
-        try:
-            log.debug(request=request)
-            return File(self.swagger_ui_root_dir)
-        except Exception, e:
-            log.exception('file-not-found', request=request)
-
-    # static swagger.json file to serve the schema
-
-    @app.route('/v1/swagger.json')
-    def swagger_json(self, request):
-        try:
-            return File(os.path.join(self.work_dir, 'swagger.json'))
-        except Exception, e:
-            log.exception('file-not-found', request=request)
 
     @app.handle_errors(grpc._channel._Rendezvous)
     def grpc_exception(self, request, failure):
