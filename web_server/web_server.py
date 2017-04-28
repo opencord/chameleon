@@ -113,6 +113,12 @@ class WebServer(object):
         elif code == StatusCode.ALREADY_EXISTS:
             request.setResponseCode(409)
             return failure.value.details()
+        elif code == StatusCode.UNAUTHENTICATED:
+            request.setResponseCode(401)
+            return failure.value.details()
+        elif code == StatusCode.PERMISSION_DENIED:
+            request.setResponseCode(403)
+            return failure.value.details()
         else:
             raise
 

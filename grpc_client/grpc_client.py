@@ -299,7 +299,9 @@ class GrpcClient(object):
             elif code in (
                     grpc.StatusCode.NOT_FOUND,
                     grpc.StatusCode.INVALID_ARGUMENT,
-                    grpc.StatusCode.ALREADY_EXISTS):
+                    grpc.StatusCode.ALREADY_EXISTS,
+                    grpc.StatusCode.UNAUTHENTICATED,
+                    grpc.StatusCode.PERMISSION_DENIED):
 
                 pass  # don't log error, these occur naturally
 
