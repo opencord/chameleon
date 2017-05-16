@@ -48,7 +48,7 @@ defs = dict(
                                          get_my_primary_local_ipv4()),
     rest_port=os.environ.get('REST_PORT', 8881),
     work_dir=os.environ.get('WORK_DIR', '/tmp/chameleon'),
-    swagger_url=os.environ.get('SWAGGER_URL', '/'),
+    swagger_url=os.environ.get('SWAGGER_URL', ''),
 )
 
 
