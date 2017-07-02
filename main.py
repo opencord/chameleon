@@ -49,6 +49,9 @@ defs = dict(
     rest_port=os.environ.get('REST_PORT', 8881),
     work_dir=os.environ.get('WORK_DIR', '/tmp/chameleon'),
     swagger_url=os.environ.get('SWAGGER_URL', ''),
+    enable_tls=os.environ.get('ENABLE_TLS',"True"),
+    key=os.environ.get('KEY','/chameleon/pki/voltha.key'),
+    cert=os.environ.get('CERT','/chameleon/pki/voltha.crt'),
 )
 
 
@@ -168,6 +171,33 @@ def parse_args():
                         default=defs['swagger_url'],
                         help=_help)
 
+    _help = ('Enable TLS or not (default: %s). '
+             % defs['enable_tls'])
+    parser.add_argument('-t', '--tls-enable',
+                        dest='enable_tls',
+                        action='store',
+                        default=defs['enable_tls'],
+                        help=_help)
+
+    _help = ('Path to chameleon ssl server private key (default: %s). '
+             'If relative, it is relative to main.py of chameleon.'
+             % defs['key'])
+    parser.add_argument('-k', '--key',
+                        dest='key',
+                        action='store',
+                        default=defs['key'],
+                        help=_help)
+
+    _help = ('Path to chameleon ssl server certificate file (default: %s). '
+             'If relative, it is relative to main.py of chameleon.'
+             % defs['cert'])
+    parser.add_argument('-f', '--cert-file',
+                        dest='cert',
+                        action='store',
+                        default=defs['cert'],
+                        help=_help)
+
+
     args = parser.parse_args()
 
     # post-processing
@@ -235,8 +265,34 @@ class Main(object):
             args = self.args
             self.grpc_client = yield \
                 GrpcClient(args.consul, args.work_dir, args.grpc_endpoint)
-            self.rest_server = yield \
-                WebServer(args.rest_port, args.work_dir, args.swagger_url, self.grpc_client).start()
+
+            if args.enable_tls == "False":
+                self.log.info('tls-disabled-through-configuration')
+                self.rest_server = yield \
+                    WebServer(args.rest_port, args.work_dir, args.swagger_url,\
+                    self.grpc_client).start()
+            else:
+                # If TLS is enabled, but the server key or cert is not found,
+                # then automatically disable TLS
+                if not os.path.exists(args.key) or \
+                   not os.path.exists(args.cert):
+                    if not os.path.exists(args.key):
+                        self.log.error('key-not-found')
+                    if not os.path.exists(args.cert):
+                        self.log.error('cert-not-found')
+                    self.log.info('disabling-tls-due-to-missing-pki-files')
+                    self.rest_server = yield \
+                                        WebServer(args.rest_port, args.work_dir,\
+                                        args.swagger_url,\
+                                        self.grpc_client).start()
+                else:
+                    self.log.info('tls-enabled')
+                    self.rest_server = yield \
+                                        WebServer(args.rest_port, args.work_dir,\
+                                        args.swagger_url,\
+                                        self.grpc_client, args.key,\
+                                        args.cert).start()
+
             self.grpc_client.set_reconnect_callback(
                 self.rest_server.reload_generated_routes).start()
             self.log.info('started-internal-services')

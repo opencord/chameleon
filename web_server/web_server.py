@@ -24,8 +24,11 @@ from structlog import get_logger
 from twisted.internet import reactor, endpoints
 from twisted.internet.defer import inlineCallbacks, returnValue
 from twisted.internet.tcp import Port
+from twisted.internet.endpoints import SSL4ServerEndpoint
+from twisted.internet.ssl import DefaultOpenSSLContextFactory
 from twisted.web.server import Site
 from twisted.web.static import File
+from OpenSSL.SSL import TLSv1_2_METHOD
 from werkzeug.exceptions import BadRequest
 from grpc import StatusCode
 
@@ -37,12 +40,14 @@ class WebServer(object):
 
     app = Klein()
 
-    def __init__(self, port, work_dir, swagger_url, grpc_client):
+    def __init__(self, port, work_dir, swagger_url, grpc_client, key=None, cert=None):
         self.port = port
         self.site = None
         self.work_dir = work_dir
-        self.grpc_client = grpc_client
         self.swagger_url = swagger_url
+        self.grpc_client = grpc_client
+        self.key = key
+        self.cert = cert
 
         self.swagger_ui_root_dir = os.path.abspath(
             os.path.join(os.path.dirname(__file__), '../swagger_ui'))
@@ -88,11 +93,20 @@ class WebServer(object):
 
     @inlineCallbacks
     def _open_endpoint(self):
-        endpoint = endpoints.TCP4ServerEndpoint(reactor, self.port)
-        self.site = Site(self.app.resource())
-        self.tcp_port = yield endpoint.listen(self.site)
-        log.info('web-server-started', port=self.port)
-        self.endpoint = endpoint
+        try:
+            if self.key == None or self.cert == None:
+                endpoint = endpoints.TCP4ServerEndpoint(reactor, self.port)
+            else:
+                # Enforce TLSv1_2_METHOD
+                ctx = DefaultOpenSSLContextFactory(self.key, self.cert, TLSv1_2_METHOD)
+                endpoint = SSL4ServerEndpoint(reactor, self.port, ctx)
+
+            self.site = Site(self.app.resource())
+            self.tcp_port = yield endpoint.listen(self.site)
+            log.info('web-server-started', port=self.port)
+            self.endpoint = endpoint
+        except Exception, e:
+            self.log.exception('web-server-failed-to-start', e=e)
 
     def reload_generated_routes(self):
         for fname in os.listdir(self.work_dir):
