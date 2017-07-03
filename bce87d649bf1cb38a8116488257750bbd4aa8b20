@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a202591_1e407155",
+        "filename": "main.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1000113
+      },
+      "writtenOn": "2017-07-03T15:46:51Z",
+      "side": 1,
+      "message": "Chameleon Container needs to be created with this directory /chameleon/pki,  And files from voltha/pki need to be copied over to /chameleon/pki,  So dockerfile and Makefile need to be modified for this.",
+      "revId": "bce87d649bf1cb38a8116488257750bbd4aa8b20",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
