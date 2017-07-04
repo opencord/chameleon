@@ -42,6 +42,30 @@
     },
     {
       "key": {
+        "uuid": "5a202591_69520d15",
+        "filename": "main.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 1000127
+      },
+      "writtenOn": "2017-07-04T14:20:18Z",
+      "side": 1,
+      "message": "ok",
+      "parentUuid": "5a202591_de08b92f",
+      "range": {
+        "startLine": 279,
+        "startChar": 39,
+        "endLine": 279,
+        "endChar": 40
+      },
+      "revId": "bce87d649bf1cb38a8116488257750bbd4aa8b20",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a202591_be05fd15",
         "filename": "web_server/web_server.py",
         "patchSetId": 1
@@ -53,6 +77,24 @@
       "writtenOn": "2017-07-04T06:46:14Z",
       "side": 1,
       "message": "Instead of having this flag, you could just use the key is None or cert is None for the same purpose",
+      "revId": "bce87d649bf1cb38a8116488257750bbd4aa8b20",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a202591_295c1525",
+        "filename": "web_server/web_server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1000127
+      },
+      "writtenOn": "2017-07-04T14:20:18Z",
+      "side": 1,
+      "message": "ok",
+      "parentUuid": "5a202591_be05fd15",
       "revId": "bce87d649bf1cb38a8116488257750bbd4aa8b20",
       "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
       "unresolved": false
