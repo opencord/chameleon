@@ -1,0 +1,9 @@
+*.swp
+
+# Generated files
+protos/schema_pb2.py
+protos/schema_pb2_grpc.py
+protos/third_party/google/api/annotations_pb2.py
+protos/third_party/google/api/annotations_pb2_grpc.py
+protos/third_party/google/api/http_pb2.py
+protos/third_party/google/api/http_pb2_grpc.py
