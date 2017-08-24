@@ -47,5 +47,5 @@ logging:
         '': # root logger
             handlers: [console, fluent, localRotatingFile]
             level: INFO # this can be bumped up/down by -q and -v command line
-                        # option
+                        # options
             propagate: False
