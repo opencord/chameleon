@@ -122,7 +122,7 @@ class GrpcClient(object):
             if e.code() == grpc.StatusCode.UNAVAILABLE:
                 log.info('grpc-endpoint-not-available')
             else:
-                log.exception(e)
+                log.exception('rendezvous error', e=e)
             yield self._backoff('not-available')
 
         except Exception, e:
