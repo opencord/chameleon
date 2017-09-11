@@ -31,6 +31,7 @@ from twisted.web.static import File
 from OpenSSL.SSL import TLSv1_2_METHOD
 from werkzeug.exceptions import BadRequest
 from grpc import StatusCode
+import json
 
 
 log = get_logger()
@@ -136,5 +137,6 @@ class WebServer(object):
             request.setResponseCode(403)
             return failure.value.details()
         else:
-            raise
+            request.setResponseCode(500)
+            return json.dumps({'error': 'Internal Server Error', 'specific_error': failure.value.details()})
 
