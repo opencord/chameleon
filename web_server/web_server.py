@@ -136,5 +136,6 @@ class WebServer(object):
             request.setResponseCode(403)
             return failure.value.details()
         else:
-            raise
+            request.setResponseCode(500)
+            return json.dumps({'error': 'Internal Server Error', 'specific_error': failure.value.details()})
 
