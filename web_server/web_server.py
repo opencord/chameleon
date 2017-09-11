@@ -136,5 +136,6 @@ class WebServer(object):
             request.setResponseCode(403)
             return failure.value.details()
         else:
-            raise
+            request.setResponseCode(500)
+            return failure.value.details()
 
