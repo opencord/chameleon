@@ -22,24 +22,33 @@ endif
 
 default: build
 
-PROTO_FILES := $(wildcard *.proto) $(wildcard third_party/google/api/*proto)
-PROTO_PB2_FILES := $(foreach f,$(PROTO_FILES),$(subst .proto,_pb2.py,$(f)))
-PROTO_DESC_FILES := $(foreach f,$(PROTO_FILES),$(subst .proto,.desc,$(f)))
+TARGET_PROTO_DIR := $(VOLTHA_BASE)/chameleon/protos
+SOURCE_PROTO_DIR := $(VOLTHA_BASE)/voltha/protos
+TARGET_GOOGLE_API_DIR := $(TARGET_PROTO_DIR)/third_party/google/api
+SOURCE_GOOGLE_API_DIR := $(SOURCE_PROTO_DIR)/third_party/google/api
+
+SCHEMA_PROTO_FILE := schema.proto
+SCHEMA_PB2_FILES := schema_pb2*.py
 
 PROTOC_PREFIX := /usr/local
 PROTOC_LIBDIR := $(PROTOC_PREFIX)/lib
 
-build: $(PROTO_PB2_FILES)
+build: copyprotos copypb2files
 
-%_pb2.py: %.proto Makefile
-	@echo "Building protocol buffer artifacts from $<"
-	env LD_LIBRARY_PATH=$(PROTOC_LIBDIR) python -m grpc.tools.protoc \
-	    -I. \
-	    -I./third_party \
-	    --python_out=. \
-	    --grpc_python_out=. \
-	    $<
+copyprotos:
+	cp $(SOURCE_PROTO_DIR)/$(SCHEMA_PROTO_FILE) $(TARGET_PROTO_DIR)
+
+copypb2files:
+	rsync -av --include '*/' --exclude='third_party/__init__.py' --include $(SCHEMA_PB2_FILES)	--exclude='*' $(SOURCE_PROTO_DIR)/ $(TARGET_PROTO_DIR)
+	rsync -av --include '*/' --exclude='third_party/__init__.py' --include '*.py' --include '*.desc' --include '*.proto' --exclude='*' $(SOURCE_GOOGLE_API_DIR)/ $(TARGET_GOOGLE_API_DIR)
 
 clean:
-	rm -f $(PROTO_PB2_FILES) $(PROTO_DESC_FILES)
+	rm -f $(TARGET_PROTO_DIR)/*_pb2*.py
+	rm -f $(TARGET_PROTO_DIR)/*_pb2*.pyc
+	rm -f $(TARGET_PROTO_DIR)/*.proto
+	rm -f $(TARGET_GOOGLE_API_DIR)/*_pb2*.py
+	rm -f $(TARGET_GOOGLE_API_DIR)/*_pb2*.pyc
+	rm -f $(TARGET_GOOGLE_API_DIR)/*.desc
+	rm -f $(TARGET_GOOGLE_API_DIR)/*.proto
+
 
