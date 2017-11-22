@@ -67,7 +67,7 @@ def add_routes(app, grpc_client):
         raise NotImplementedError('cannot handle specific body field list')
         {% endif %}
         try:
-            req = ParseDict(data, {{ type_map[method['input_type']] }}())
+            req = ParseDict(data, {{ type_map[method['input_type']] }}(), ignore_unknown_fields=True)
         except Exception, e:
             log.error('cannot-convert-to-protobuf', e=e, data=data)
             raise
