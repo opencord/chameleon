@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "871b6fec_86f6bfb3",
+        "filename": "protoc_plugins/gw_gen.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1000003
+      },
+      "writtenOn": "2017-11-22T21:42:02Z",
+      "side": 1,
+      "message": "should we issue a warning when there are unknown fields? or make it an option as to if unknown fields should be ignored?\n\nI am concerned that if someone has a type in their POST data then this could mask it and they wouldn\u0027t really have a way to troubleshoot the issue as to why it didn\u0027t work.\n\nBy at least allowing a deployment to configure to \"strict\" mode you would, at some level, be able to determine if the incoming request was valid or not.\n\nIn short, I am not sure we should be ignoring unknown fields.",
+      "revId": "6e3327cba63b03889c13c3677972d809df15606c",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
