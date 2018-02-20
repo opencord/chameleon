@@ -51,12 +51,13 @@ class GrpcClient(object):
     RETRY_BACKOFF = [0.05, 0.1, 0.2, 0.5, 1, 2, 5]
 
     def __init__(self, consul_endpoint, work_dir, endpoint='localhost:50055',
-                 reconnect_callback=None, credentials=None):
+                 reconnect_callback=None, credentials=None, restart_on_disconnect=False):
         self.consul_endpoint = consul_endpoint
         self.endpoint = endpoint
         self.work_dir = work_dir
         self.reconnect_callback = reconnect_callback
         self.credentials = credentials
+        self.restart_on_disconnect = restart_on_disconnect
 
         self.plugin_dir = os.path.abspath(os.path.join(
             os.path.dirname(__file__), '../protoc_plugins'))
@@ -286,6 +287,10 @@ class GrpcClient(object):
             code = e.code()
             if code == grpc.StatusCode.UNAVAILABLE:
                 e = ServiceUnavailable()
+
+                if self.restart_on_disconnect:
+                    log.info("gRPC disconnect -- restarting")
+                    os.execv(sys.executable, ['python'] + sys.argv)
 
                 if self.connected:
                     self.connected = False
