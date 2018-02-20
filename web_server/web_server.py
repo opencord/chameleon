@@ -114,6 +114,7 @@ class WebServer(object):
             if fname.endswith('_gw.py'):
                 module_name = fname.replace('.py', '')
                 m = __import__(module_name)
+                reload(m)
                 assert hasattr(m, 'add_routes')
                 m.add_routes(self.app, self.grpc_client)
                 log.info('routes-loaded', module=module_name)

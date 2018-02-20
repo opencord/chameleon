@@ -42,6 +42,7 @@ from twisted.internet.defer import inlineCallbacks, returnValue
 from {{ pypackage }} import {{ module }}
 {% else %}
 import {{ module }}
+reload({{ module }})
 {% endif %}
 {% endfor %}
 
