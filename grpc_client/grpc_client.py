@@ -51,12 +51,13 @@ class GrpcClient(object):
     RETRY_BACKOFF = [0.05, 0.1, 0.2, 0.5, 1, 2, 5]
 
     def __init__(self, consul_endpoint, work_dir, endpoint='localhost:50055',
-                 reconnect_callback=None, credentials=None):
+                 reconnect_callback=None, credentials=None, restart_on_disconnect=False):
         self.consul_endpoint = consul_endpoint
         self.endpoint = endpoint
         self.work_dir = work_dir
         self.reconnect_callback = reconnect_callback
         self.credentials = credentials
+        self.restart_on_disconnect = restart_on_disconnect
 
         self.plugin_dir = os.path.abspath(os.path.join(
             os.path.dirname(__file__), '../protoc_plugins'))
@@ -66,6 +67,7 @@ class GrpcClient(object):
         self.retries = 0
         self.shutting_down = False
         self.connected = False
+        self.was_connected = False
 
     def start(self):
         log.debug('starting')
@@ -84,6 +86,14 @@ class GrpcClient(object):
     def set_reconnect_callback(self, reconnect_callback):
         self.reconnect_callback = reconnect_callback
         return self
+
+    def connectivity_callback(self, connectivity):
+        if (self.was_connected) and (connectivity in [connectivity.TRANSIENT_FAILURE, connectivity.FATAL_FAILURE, connectivity.SHUTDOWN]):
+            log.info("connectivity lost -- restarting")
+            os.execv(sys.executable, ['python'] + sys.argv)
+
+        if (connectivity == connectivity.READY):
+            self.was_connected = True
 
     @inlineCallbacks
     def connect(self):
@@ -107,6 +117,9 @@ class GrpcClient(object):
             else:
                 log.info('insecurely connecting', endpoint=_endpoint)
                 self.channel = grpc.insecure_channel(_endpoint)
+
+            if self.restart_on_disconnect:
+                self.channel.subscribe(self.connectivity_callback)
 
             swagger_from = self._retrieve_schema()
             self._compile_proto_files(swagger_from)
