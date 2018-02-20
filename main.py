@@ -264,7 +264,7 @@ class Main(object):
             self.log.info('starting-internal-components')
             args = self.args
             self.grpc_client = yield \
-                GrpcClient(args.consul, args.work_dir, args.grpc_endpoint)
+                GrpcClient(args.consul, args.work_dir, args.grpc_endpoint, restart_on_disconnect=True) # XXX FIXME
 
             if args.enable_tls == "False":
                 self.log.info('tls-disabled-through-configuration')
