@@ -35,7 +35,7 @@ from twisted.internet.defer import inlineCallbacks, returnValue
 from werkzeug.exceptions import ServiceUnavailable
 
 from chameleon.protos import third_party
-from chameleon.protos.schema_pb2 import SchemaServiceStub
+from chameleon.protos.schema_pb2_grpc import SchemaServiceStub
 from google.protobuf.empty_pb2 import Empty
 
 from chameleon.utils.asleep import asleep
@@ -89,7 +89,7 @@ class GrpcClient(object):
         return self
 
     def connectivity_callback(self, client, connectivity):
-        if (self.was_connected) and (connectivity in [connectivity.TRANSIENT_FAILURE, connectivity.FATAL_FAILURE, connectivity.SHUTDOWN]):
+        if (self.was_connected) and (connectivity in [connectivity.TRANSIENT_FAILURE, connectivity.SHUTDOWN]):
             log.info("connectivity lost -- restarting")
             os.execv(sys.executable, ['python'] + sys.argv)
 
