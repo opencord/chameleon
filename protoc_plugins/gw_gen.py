@@ -40,8 +40,16 @@ from twisted.internet.defer import inlineCallbacks, returnValue
 {% for pypackage, module in includes %}
 {% if pypackage %}
 from {{ pypackage }} import {{ module }}
+try:
+    from {{ pypackage }} import {{ module }}_grpc
+except ImportError:
+    pass
 {% else %}
 import {{ module }}
+try:
+    import {{ module }}_grpc
+except ImportError:
+    pass
 {% endif %}
 {% endfor %}
 
