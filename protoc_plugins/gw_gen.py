@@ -40,8 +40,10 @@ from twisted.internet.defer import inlineCallbacks, returnValue
 {% for pypackage, module in includes %}
 {% if pypackage %}
 from {{ pypackage }} import {{ module }}
+from {{ pypackage }} import {{ module }}_grpc
 {% else %}
 import {{ module }}
+import {{ module }}_grpc
 {% endif %}
 {% endfor %}
 
