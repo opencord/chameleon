@@ -40,8 +40,16 @@ from twisted.internet.defer import inlineCallbacks, returnValue
 {% for pypackage, module in includes %}
 {% if pypackage %}
 from {{ pypackage }} import {{ module }}
+try:
+    from {{ pypackage }} import {{ module }}_grpc
+except ImportError:
+    pass
 {% else %}
 import {{ module }}
+try:
+    import {{ module }}_grpc
+except ImportError:
+    pass
 {% endif %}
 {% endfor %}
 
@@ -215,7 +223,7 @@ class IncludeManager(object):
         file_name = self.fullname_to_filename[top_level_symbol]
         self.includes_needed.add(file_name)
         module_name = self.filename_to_module[file_name][1]
-        python_name = module_name + '.' + name + nested_name
+        python_name = module_name + '_grpc.' + name + nested_name
         self.type_map[fullname] = python_name
 
     def get_type_map(self):
