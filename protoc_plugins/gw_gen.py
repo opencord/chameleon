@@ -40,8 +40,16 @@ from twisted.internet.defer import inlineCallbacks, returnValue
 {% for pypackage, module in includes %}
 {% if pypackage %}
 from {{ pypackage }} import {{ module }}
+try:
+    from {{ pypackage }} import {{ module }}_grpc
+except ImportError:
+    pass
 {% else %}
 import {{ module }}
+try:
+    import {{ module }}_grpc
+except ImportError:
+    pass
 {% endif %}
 {% endfor %}
 
@@ -72,7 +80,7 @@ def add_routes(app, grpc_client):
             log.error('cannot-convert-to-protobuf', e=e, data=data)
             raise
         res, metadata = yield grpc_client.invoke(
-            {{ type_map[method['service']] }}Stub,
+            {{ stub_map[method['service']] }}Stub,
             '{{ method['method'] }}', req, request.getAllHeaders().items())
         try:
             out_data = MessageToDict(res, True, True)
@@ -151,9 +159,9 @@ def traverse_methods(proto_file):
                     yield data
 
 
-def generate_gw_code(file_name, methods, type_map, includes):
+def generate_gw_code(file_name, methods, type_map, stub_map, includes):
     return template.render(file_name=file_name, methods=methods,
-                           type_map=type_map, includes=includes)
+                           type_map=type_map, stub_map=stub_map, includes=includes)
 
 
 class IncludeManager(object):
@@ -168,6 +176,7 @@ class IncludeManager(object):
         self.fullname_to_filename = {}
         self.prefix_table = []  # sorted table of top-level symbols in protos
         self.type_map = {}  # full name as used in .proto -> python name
+        self.stub_map = {}
         self.includes_needed = set()  # names of files needed to be included
         self.filename_to_module = {}  # filename -> (package, module)
 
@@ -217,9 +226,14 @@ class IncludeManager(object):
         module_name = self.filename_to_module[file_name][1]
         python_name = module_name + '.' + name + nested_name
         self.type_map[fullname] = python_name
+        python_name = module_name + '_grpc.' + name + nested_name
+        self.stub_map[fullname] = python_name
 
     def get_type_map(self):
         return self.type_map
+
+    def get_stub_map(self):
+        return self.stub_map
 
     def get_includes(self):
         return sorted(
@@ -244,6 +258,7 @@ def generate_code(request, response):
             include_manager.add_needed_symbol(data['service'])
 
         type_map = include_manager.get_type_map()
+        stub_map = include_manager.get_stub_map()
         includes = include_manager.get_includes()
 
         # as a nice side-effect, generate a json file capturing the essence
@@ -251,7 +266,7 @@ def generate_code(request, response):
         f = response.file.add()
         f.name = proto_file.name + '.json'
         f.content = dumps(dict(
-            type_rename_map=type_map,
+            type_rename_map=type_map,  # TODO: is stub_map needed here?
             includes=includes,
             methods=methods), indent=4)
 
@@ -260,7 +275,7 @@ def generate_code(request, response):
         assert proto_file.name.endswith('.proto')
         f.name = proto_file.name.replace('.proto', '_gw.py')
         f.content = generate_gw_code(proto_file.name,
-                                     methods, type_map, includes)
+                                     methods, type_map, stub_map, includes)
 
 
 if __name__ == '__main__':
