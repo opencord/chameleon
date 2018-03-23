@@ -34,7 +34,6 @@ from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks, returnValue
 from werkzeug.exceptions import ServiceUnavailable
 
-from chameleon.protos import third_party
 from chameleon.protos.schema_pb2_grpc import SchemaServiceStub
 from google.protobuf.empty_pb2 import Empty
 
