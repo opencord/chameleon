@@ -20,7 +20,7 @@ from google.protobuf.compiler import plugin_pb2 as plugin
 from simplejson import dumps
 
 # without this import, http method annotations would not be recognized:
-from google.api import annotations_pb2, http_pb2
+from chameleon.protos import annotations_pb2, http_pb2
 
 from chameleon.protoc_plugins.descriptor_parser import DescriptorParser
 from swagger_template import native_descriptors_to_swagger
