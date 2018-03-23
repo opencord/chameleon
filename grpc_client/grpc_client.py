@@ -34,7 +34,6 @@ from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks, returnValue
 from werkzeug.exceptions import ServiceUnavailable
 
-from chameleon.protos import third_party
 from chameleon.protos.schema_pb2_grpc import SchemaServiceStub
 from google.protobuf.empty_pb2 import Empty
 
@@ -236,9 +235,6 @@ class GrpcClient(object):
         web server gateway python file *_gw.py.
         :return: None
         """
-        google_api_dir = os.path.abspath(os.path.join(
-            os.path.dirname(__file__), '../protos/third_party'
-        ))
 
         chameleon_base_dir = os.path.abspath(os.path.join(
             os.path.dirname(__file__), '../..'
@@ -254,7 +250,6 @@ class GrpcClient(object):
                 'env PATH=%s PYTHONPATH=%s '
                 'python -m grpc.tools.protoc '
                 '-I. '
-                '-I%s '
                 '--python_out=. '
                 '--grpc_python_out=. '
                 '--plugin=protoc-gen-gw=%s/gw_gen.py '
@@ -264,8 +259,7 @@ class GrpcClient(object):
                 '%s' % (
                     self.work_dir,
                     ':'.join([os.environ['PATH'], self.plugin_dir]),
-                    ':'.join([google_api_dir, chameleon_base_dir]),
-                    google_api_dir,
+                    chameleon_base_dir,
                     self.plugin_dir,
                     self.plugin_dir,
                     '--swagger_out=. ' if need_swagger else '',

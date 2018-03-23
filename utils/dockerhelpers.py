@@ -14,12 +14,31 @@
 # limitations under the License.
 #
 import os
+import sys
+from distutils.version import LooseVersion
 
-from docker import Client
 from structlog import get_logger
+log = get_logger()
+
+# handle the python docker v1 to v2 API differences
+try:
+    from docker import __version__ as docker_version
+
+    if LooseVersion(docker_version) < LooseVersion('2.0.0'):
+        log.error("Unsupported python docker module!"
+                  "Please upgrade to docker 2.x or later")
+
+        # <2.x compatible import
+        from docker import Client as DockerClient
+    else:
+        # >2.x compatible import
+        from docker import APIClient as DockerClient
+
+except ImportError:
+    log.error("Unable to load python docker module!")
+    sys.exit(1)
 
 docker_socket = os.environ.get('DOCKER_SOCK', 'unix://tmp/docker.sock')
-log = get_logger()
 
 
 def get_my_containers_name():
@@ -33,7 +52,7 @@ def get_my_containers_name():
     my_container_id = os.environ.get('HOSTNAME', None)
 
     try:
-        docker_cli = Client(base_url=docker_socket)
+        docker_cli = DockerClient(base_url=docker_socket)
         info = docker_cli.inspect_container(my_container_id)
 
     except Exception, e:

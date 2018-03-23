@@ -28,10 +28,6 @@ from chameleon.utils.dockerhelpers import get_my_containers_name
 from chameleon.utils.nethelpers import get_my_primary_local_ipv4
 from chameleon.utils.structlog_setup import setup_logging
 
-base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(base_dir)
-sys.path.append(os.path.join(base_dir, '/chameleon/protos/third_party'))
-
 from chameleon.grpc_client.grpc_client import GrpcClient
 from chameleon.web_server.web_server import WebServer
 
