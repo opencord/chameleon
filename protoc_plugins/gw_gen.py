@@ -23,9 +23,7 @@ from google.protobuf.descriptor_pb2 import ServiceDescriptorProto, \
 from jinja2 import Template
 from simplejson import dumps
 
-from chameleon.protos.third_party.google.api import annotations_pb2, http_pb2
-_ = annotations_pb2, http_pb2  # to keep import line from being optimized out
-
+from chameleon.protos import annotations_pb2, http_pb2
 
 template = Template("""
 # Generated file; please do not edit
@@ -111,7 +109,7 @@ def traverse_methods(proto_file):
             options = method.options
             assert isinstance(options, MethodOptions)
             for fd, http in options.ListFields():
-                if fd.full_name == 'google.api.http':
+                if fd.full_name == 'googleapi.http':
                     assert fd.name == 'http'
                     assert isinstance(http, http_pb2.HttpRule)
 
