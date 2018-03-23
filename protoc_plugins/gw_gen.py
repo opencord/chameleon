@@ -23,7 +23,7 @@ from google.protobuf.descriptor_pb2 import ServiceDescriptorProto, \
 from jinja2 import Template
 from simplejson import dumps
 
-from chameleon.protos.third_party.google.api import annotations_pb2, http_pb2
+from chameleon.protos.google.api import annotations_pb2, http_pb2
 _ = annotations_pb2, http_pb2  # to keep import line from being optimized out
 
 
