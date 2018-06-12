@@ -201,7 +201,7 @@ class GrpcClient(object):
         assert isinstance(self.channel, grpc.Channel)
         stub = SchemaServiceStub(self.channel)
         # try:
-        schemas = stub.GetSchema(Empty())
+        schemas = stub.GetSchema(Empty(), timeout=120)
         # except _Rendezvous, e:
         #     if e.code == grpc.StatusCode.UNAVAILABLE:
         #
