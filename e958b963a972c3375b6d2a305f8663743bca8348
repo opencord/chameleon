@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e010d420_7f9a0770",
+        "filename": "grpc_client/grpc_client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 1000007
+      },
+      "writtenOn": "2018-06-13T20:05:04Z",
+      "side": 1,
+      "message": "is it possible to shorten this timeout? waiting 2 minutes during a dev cycle looks a really long imte",
+      "range": {
+        "startLine": 204,
+        "startChar": 50,
+        "endLine": 204,
+        "endChar": 53
+      },
+      "revId": "e958b963a972c3375b6d2a305f8663743bca8348",
+      "serverId": "2a2bfe1b-c5c2-48ed-9ac8-16438ab24388",
+      "unresolved": false
+    }
+  ]
+}
