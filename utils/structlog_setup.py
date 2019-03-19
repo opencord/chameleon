@@ -43,6 +43,7 @@ class PlainRenderedOrderedDict(OrderedDict):
     """Our special version of OrderedDict that renders into string as a dict,
        to make the log stream output cleaner.
     """
+
     def __repr__(self, _repr_running={}):
         'od.__repr__() <==> repr(od)'
         call_key = id(self), _get_ident()

@@ -139,14 +139,14 @@ class GrpcClient(object):
 
             return
 
-        except _Rendezvous, e:
+        except _Rendezvous as e:
             if e.code() == grpc.StatusCode.UNAVAILABLE:
                 log.info('grpc-endpoint-not-available')
             else:
                 log.exception('rendezvous error', e=e)
             yield self._backoff('not-available')
 
-        except Exception, e:
+        except Exception as e:
             if not self.shutting_down:
                 log.exception('cannot-connect', endpoint=_endpoint)
             yield self._backoff('unknown-error')
@@ -298,7 +298,7 @@ class GrpcClient(object):
             response, rendezvous = method.with_call(request, metadata=metadata)
             returnValue((response, rendezvous.trailing_metadata()))
 
-        except grpc._channel._Rendezvous, e:
+        except grpc._channel._Rendezvous as e:
             code = e.code()
             if code == grpc.StatusCode.UNAVAILABLE:
                 e = ServiceUnavailable()
