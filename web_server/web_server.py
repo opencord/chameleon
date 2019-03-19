@@ -66,14 +66,14 @@ class WebServer(object):
             try:
                 log.debug(request=request)
                 return File(self.swagger_ui_root_dir)
-            except Exception, e:
+            except Exception as e:
                 log.exception('file-not-found', request=request)
 
         @app.route(swagger_url + '/v1/swagger.json')
         def swagger_json(self, request):
             try:
                 return File(os.path.join(self.work_dir, 'swagger.json'))
-            except Exception, e:
+            except Exception as e:
                 log.exception('file-not-found', request=request)
 
     @inlineCallbacks
@@ -95,7 +95,7 @@ class WebServer(object):
     @inlineCallbacks
     def _open_endpoint(self):
         try:
-            if self.key == None or self.cert == None:
+            if self.key is None or self.cert is None:
                 endpoint = endpoints.TCP4ServerEndpoint(reactor, self.port)
             else:
                 # Enforce TLSv1_2_METHOD
@@ -106,7 +106,7 @@ class WebServer(object):
             self.tcp_port = yield endpoint.listen(self.site)
             log.info('web-server-started', port=self.port)
             self.endpoint = endpoint
-        except Exception, e:
+        except Exception as e:
             self.log.exception('web-server-failed-to-start', e=e)
 
     def reload_generated_routes(self):
@@ -139,4 +139,3 @@ class WebServer(object):
         else:
             request.setResponseCode(500)
             return json.dumps({'error': 'Internal Server Error', 'specific_error': failure.value.details()})
-

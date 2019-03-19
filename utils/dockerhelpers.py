@@ -55,7 +55,7 @@ def get_my_containers_name():
         docker_cli = DockerClient(base_url=docker_socket)
         info = docker_cli.inspect_container(my_container_id)
 
-    except Exception, e:
+    except Exception as e:
         log.exception('failed', my_container_id=my_container_id, e=e)
         raise
 

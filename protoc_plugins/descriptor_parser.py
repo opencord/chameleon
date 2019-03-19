@@ -21,7 +21,8 @@ from google.protobuf.descriptor import FieldDescriptor, Descriptor
 from google.protobuf.message import Message
 
 
-class InvalidDescriptorError(Exception): pass
+class InvalidDescriptorError(Exception):
+    pass
 
 
 class DescriptorParser(object):
@@ -133,8 +134,8 @@ class DescriptorParser(object):
         return d
 
     def parse_file_descriptors(self, descriptors,
-                              type_tag_name=None,
-                              fold_comments=False):
+                               type_tag_name=None,
+                               fold_comments=False):
         return [self.parse_file_descriptor(descriptor,
                                            type_tag_name=type_tag_name,
                                            fold_comments=fold_comments)

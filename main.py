@@ -45,9 +45,9 @@ defs = dict(
     rest_port=os.environ.get('REST_PORT', 8881),
     work_dir=os.environ.get('WORK_DIR', '/tmp/chameleon'),
     swagger_url=os.environ.get('SWAGGER_URL', ''),
-    enable_tls=os.environ.get('ENABLE_TLS',"True"),
-    key=os.environ.get('KEY','/chameleon/pki/voltha.key'),
-    cert=os.environ.get('CERT','/chameleon/pki/voltha.crt'),
+    enable_tls=os.environ.get('ENABLE_TLS', "True"),
+    key=os.environ.get('KEY', '/chameleon/pki/voltha.key'),
+    cert=os.environ.get('CERT', '/chameleon/pki/voltha.crt'),
 )
 
 
@@ -217,8 +217,9 @@ def load_config(args):
         path = os.path.join(dir, path)
     path = os.path.abspath(path)
     with open(path) as fd:
-        config = yaml.load(fd)
+        config = yaml.safe_load(fd)
     return config
+
 
 banner = r'''
    ____   _                                  _
@@ -228,6 +229,7 @@ banner = r'''
   \____| |_| |_|  \__,_| |_| |_| |_|  \___| |_|  \___|  \___/  |_| |_|
 
 '''
+
 
 def print_banner(log):
     for line in banner.strip('\n').splitlines():
@@ -271,8 +273,8 @@ class Main(object):
             if args.enable_tls == "False":
                 self.log.info('tls-disabled-through-configuration')
                 self.rest_server = yield \
-                    WebServer(args.rest_port, args.work_dir, args.swagger_url,\
-                    self.grpc_client).start()
+                    WebServer(args.rest_port, args.work_dir, args.swagger_url,
+                              self.grpc_client).start()
             else:
                 # If TLS is enabled, but the server key or cert is not found,
                 # then automatically disable TLS
@@ -284,21 +286,21 @@ class Main(object):
                         self.log.error('cert-not-found')
                     self.log.info('disabling-tls-due-to-missing-pki-files')
                     self.rest_server = yield \
-                                        WebServer(args.rest_port, args.work_dir,\
-                                        args.swagger_url,\
-                                        self.grpc_client).start()
+                        WebServer(args.rest_port, args.work_dir,
+                                  args.swagger_url,
+                                  self.grpc_client).start()
                 else:
                     self.log.info('tls-enabled')
                     self.rest_server = yield \
-                                        WebServer(args.rest_port, args.work_dir,\
-                                        args.swagger_url,\
-                                        self.grpc_client, args.key,\
-                                        args.cert).start()
+                        WebServer(args.rest_port, args.work_dir,
+                                  args.swagger_url,
+                                  self.grpc_client, args.key,
+                                  args.cert).start()
 
             self.grpc_client.set_reconnect_callback(
                 self.rest_server.reload_generated_routes).start()
             self.log.info('started-internal-services')
-        except Exception, e:
+        except Exception as e:
             self.log.exception('startup-failed', e=e)
 
     @inlineCallbacks

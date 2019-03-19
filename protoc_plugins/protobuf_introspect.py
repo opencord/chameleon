@@ -35,7 +35,8 @@ from simplejson import dumps
 from google.protobuf import descriptor_pb2
 
 
-class InvalidDescriptorError(Exception): pass
+class InvalidDescriptorError(Exception):
+    pass
 
 
 class DescriptorParser(object):
@@ -123,7 +124,7 @@ class DescriptorParser(object):
                 location.get('leading_comments', '').strip(' '),
                 location.get('trailing_comments', '').strip(' '),
                 ''.join(block.strip(' ') for block
-                          in location.get('leading_detached_comments', ''))
+                        in location.get('leading_detached_comments', ''))
             ]).strip()
 
             # ignore locations with no comments

@@ -23,9 +23,16 @@ re_path_param = re.compile(r'/{([^{]+)}')
 re_segment = re.compile(r'/(?P<absolute>[^{}/]+)|(?P<symbolic>{[^}]+})')
 
 
-class DuplicateMethodAndPathError(Exception): pass
-class ProtobufCompilationFailedError(Exception): pass
-class InvalidPathArgumentError(Exception): pass
+class DuplicateMethodAndPathError(Exception):
+    pass
+
+
+class ProtobufCompilationFailedError(Exception):
+    pass
+
+
+class InvalidPathArgumentError(Exception):
+    pass
 
 
 def native_descriptors_to_swagger(native_descriptors):
@@ -117,7 +124,7 @@ def iterate_methods(descriptors):
             for method in service.get('method', []):
                 # skip methods that do not have http options
                 options = method['options']
-                if options.has_key('http'):
+                if 'http' in options:
                     full_name = service_prefix + '.' + method['name']
                     yield full_name, service, method
 
@@ -165,7 +172,7 @@ def generate_definitions(types_referenced, types):
         definition, types_referenced = make_definition(type, types)
         definitions[full_name] = definition
         for type_referenced in types_referenced:
-            if not definitions.has_key(type_referenced):
+            if type_referenced not in definitions:
                 wanted.add(type_referenced)
     return definitions
 
@@ -220,7 +227,7 @@ def make_object_definition(type, types):
     if properties:
         definition['properties'] = properties
 
-    if type.has_key('_description'):
+    if '_description' in type:
         definition['description'] = type['_description']
 
     return definition, referenced
@@ -288,7 +295,7 @@ def make_property(field, types):
             'items': property
         }
 
-    if field.has_key('_description'):
+    if '_description' in field:
         property['description'] = field['_description']
 
     return field['name'], property, referenced
@@ -325,7 +332,7 @@ def generate_paths(methods_dict, definitions):
     def lookup_type(input_type, field_name):
         local_field_name, _, rest = field_name.partition('.')
         properties = input_type['properties']
-        if not properties.has_key(local_field_name):
+        if local_field_name not in properties:
             raise InvalidPathArgumentError(
                 'Input type has no field {}'.format(field_name))
         field = properties[local_field_name]
@@ -382,13 +389,13 @@ def generate_paths(methods_dict, definitions):
 
         entry = {
             'operationId': method['name'],
-            'tags': [service['name'],],
+            'tags': [service['name'], ],
             'responses': {
                 '200': {  # TODO: code is 201 and 209 in POST/DELETE?
                     'description': unicode(""),  # TODO: ever filled by proto?
                     'schema': {
                         '$ref': '#/definitions/{}'.format(
-                        method['output_type'].strip('.'))
+                            method['output_type'].strip('.'))
                     }
                 },
                 # TODO shall we prefill with standard error (verb specific),
@@ -413,7 +420,7 @@ def generate_paths(methods_dict, definitions):
         if verb in path_dict:
             raise DuplicateMethodAndPathError(
                 'There is already a {} method defined for path ({})'.format(
-                verb, path))
+                    verb, path))
         path_dict[verb] = entry
 
     return paths
@@ -447,22 +454,22 @@ def extract_summary_and_description(obj):
 
 
 TYPE_MAP = {
-        FieldDescriptor.TYPE_BOOL: ('boolean', 'boolean'),
-        FieldDescriptor.TYPE_BYTES: ('string', 'byte'),
-        FieldDescriptor.TYPE_DOUBLE: ('number', 'double'),
-        FieldDescriptor.TYPE_ENUM: ('string', 'string'),
-        FieldDescriptor.TYPE_FIXED32: ('integer', 'int64'),
-        FieldDescriptor.TYPE_FIXED64: ('string', 'uint64'),
-        FieldDescriptor.TYPE_FLOAT: ('number', 'float'),
-        FieldDescriptor.TYPE_INT32: ('integer', 'int32'),
-        FieldDescriptor.TYPE_INT64: ('string', 'int64'),
-        FieldDescriptor.TYPE_SFIXED32: ('integer', 'int32'),
-        FieldDescriptor.TYPE_SFIXED64: ('string', 'int64'),
-        FieldDescriptor.TYPE_STRING: ('string', 'string'),
-        FieldDescriptor.TYPE_SINT32: ('integer', 'int32'),
-        FieldDescriptor.TYPE_SINT64: ('string', 'int64'),
-        FieldDescriptor.TYPE_UINT32: ('integer', 'int64'),
-        FieldDescriptor.TYPE_UINT64: ('string', 'uint64'),
-        # FieldDescriptor.TYPE_MESSAGE:
-        # FieldDescriptor.TYPE_GROUP:
+    FieldDescriptor.TYPE_BOOL: ('boolean', 'boolean'),
+    FieldDescriptor.TYPE_BYTES: ('string', 'byte'),
+    FieldDescriptor.TYPE_DOUBLE: ('number', 'double'),
+    FieldDescriptor.TYPE_ENUM: ('string', 'string'),
+    FieldDescriptor.TYPE_FIXED32: ('integer', 'int64'),
+    FieldDescriptor.TYPE_FIXED64: ('string', 'uint64'),
+    FieldDescriptor.TYPE_FLOAT: ('number', 'float'),
+    FieldDescriptor.TYPE_INT32: ('integer', 'int32'),
+    FieldDescriptor.TYPE_INT64: ('string', 'int64'),
+    FieldDescriptor.TYPE_SFIXED32: ('integer', 'int32'),
+    FieldDescriptor.TYPE_SFIXED64: ('string', 'int64'),
+    FieldDescriptor.TYPE_STRING: ('string', 'string'),
+    FieldDescriptor.TYPE_SINT32: ('integer', 'int32'),
+    FieldDescriptor.TYPE_SINT64: ('string', 'int64'),
+    FieldDescriptor.TYPE_UINT32: ('integer', 'int64'),
+    FieldDescriptor.TYPE_UINT64: ('string', 'uint64'),
+    # FieldDescriptor.TYPE_MESSAGE:
+    # FieldDescriptor.TYPE_GROUP:
 }
