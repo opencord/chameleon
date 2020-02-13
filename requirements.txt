@@ -11,3 +11,4 @@ python-consul==1.1.0
 service_identity==18.1.0
 simplejson==3.16.0
 structlog~=19.1.0
+googleapis-common-protos~=1.51.0
