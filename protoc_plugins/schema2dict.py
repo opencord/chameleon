@@ -21,7 +21,7 @@ file (from standard output) to a Python dictionary.
 """
 import json
 import sys
-from chameleon.protos import schema_pb2, annotations_pb2
+from google.api import schema_pb2, annotations_pb2
 from protobuf_to_dict import protobuf_to_dict
 
 
