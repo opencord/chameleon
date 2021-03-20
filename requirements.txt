@@ -1,4 +1,4 @@
-Jinja2==2.10
+Jinja2==2.11.3
 PyYAML==5.1
 docker==3.7.0
 fluent-logger==0.9.3
