@@ -1,5 +1,5 @@
 Jinja2==2.10
-PyYAML==5.1
+PyYAML==5.4
 docker==3.7.0
 fluent-logger==0.9.3
 grpcio-tools==1.12.0
